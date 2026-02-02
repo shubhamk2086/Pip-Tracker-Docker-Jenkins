@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mysql-db:
     image: mysql:8.0
@@ -21,7 +19,7 @@ services:
       retries: 5
 
   backend:
-    image: pip-backend:latest
+    image: backend-pip:latest
     container_name: backend
     restart: always
     depends_on:
@@ -30,7 +28,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/pipdb
       SPRING_DATASOURCE_USERNAME: pipuser
-      SPRING_DATASOURCE_PASSWORD: pip123
+      SPRING_DATOURCE_PASSWORD: pip123
     ports:
       - "8080:8080"
 
