@@ -10,18 +10,16 @@ pipeline {
     stages {
 
         stage('Build & Test Backend') {
-            agent {
-                docker {
-                    image 'maven:3.9.3-openjdk-20'
-                    args '-v $PWD:/app'
-                }
-            }
-            steps {
-                dir('backend') {
-                    sh 'mvn clean test'
-                }
-            }
+    agent {
+        docker {
+            image 'maven:3.9.6-eclipse-temurin-17'
         }
+    }
+    steps {
+        sh 
+            'mvn clean install'
+    }
+}
 
         stage('Build Frontend') {
             agent {
