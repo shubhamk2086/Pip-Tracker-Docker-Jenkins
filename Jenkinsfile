@@ -1,54 +1,32 @@
-pipeline {
+ pipeline {
     agent any
-
-    environment {
-        IMAGE_NAME_BACKEND = "pip-tracker-backend"
-        IMAGE_NAME_FRONTEND = "pip-tracker-frontend"
-        TAG = "${BUILD_NUMBER}"
-    }
 
     stages {
 
-        stage('Build & Test Backend') {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17'
-            args '-v $WORKSPACE:/app -w /app/backend'
-        }
-    }
-    steps {
-        sh 'mvn clean install'
-    }
-}
-
-
-        stage('Build Frontend') {
-            agent {
-                docker {
-                    image 'node:20-bullseye'
-                    args '-v $WORKSPACE:/app -w /app/frontend'
-                }
-            }
+        stage('Clone Repository') {
             steps {
-                sh 'npm install'
-                sh 'npm run build -- --prod'
+                git branch: 'main', url: 'https://github.com/shubhamk2086/Pip-Tracker-Docker-Jenkins.git'
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build Frontend Docker Image') {
             steps {
-                sh """
-                    docker build -t ${IMAGE_NAME_BACKEND}:${TAG} ./backend
-                    docker build -t ${IMAGE_NAME_FRONTEND}:${TAG} ./frontend
-                """
+                sh 'docker build -t your-dockerhub-username/pip-tracker-frontend:$BUILD_NUMBER ./frontend'
             }
         }
 
-        stage('Deploy Containers') {
+        stage('Build Backend Docker Image') {
+            steps {
+                sh 'docker build -t your-dockerhub-username/pip-tracker-backend:$BUILD_NUMBER ./backend'
+            }
+        }
+
+        stage('Push Docker Images') {
             steps {
                 sh '''
-                    docker-compose down
-                    docker-compose up -d --build
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push your-dockerhub-username/pip-tracker-frontend:$BUILD_NUMBER
+                    docker push your-dockerhub-username/pip-tracker-backend:$BUILD_NUMBER
                 '''
             }
         }
@@ -56,11 +34,10 @@ pipeline {
 
     post {
         success {
-            echo "Application deployed successfully 🚀"
+            echo "✅ Frontend & Backend images built and pushed successfully!"
         }
         failure {
-            echo "Build failed ❌ Deployment skipped"
+            echo "❌ Pipeline failed!"
         }
     }
 }
-
