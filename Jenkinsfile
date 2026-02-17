@@ -10,16 +10,17 @@ pipeline {
     stages {
 
         stage('Build & Test Backend') {
-            agent {
-                docker {
-                    image 'maven:3.9.6-eclipse-temurin-17'
-                    args '-v $WORKSPACE:/app -w /app/backend'
-                }
-            }
-            steps {
-                sh 'mvn clean install'
-            }
+    agent {
+        docker {
+            image 'maven:3.9.6-eclipse-temurin-17'
+            args '-v $WORKSPACE:/app -w /app/backend'
         }
+    }
+    steps {
+        sh 'mvn clean install'
+    }
+}
+
 
         stage('Build Frontend') {
             agent {
