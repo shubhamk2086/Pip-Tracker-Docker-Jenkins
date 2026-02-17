@@ -15,6 +15,24 @@ pipeline {
             }
         }
 
+        stage('Install Tools') {
+            steps {
+                sh '''
+                    echo "Updating packages..."
+                    sudo apt-get update -y
+
+                    echo "Installing Maven..."
+                    sudo apt-get install maven -y
+                    mvn -version
+
+                    echo "Installing Node.js and npm..."
+                    sudo apt-get install nodejs npm -y
+                    node -v
+                    npm -v
+                '''
+            }
+        }
+
         stage('Build & Test Backend') {
             steps {
                 dir('backend') {
@@ -49,7 +67,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
